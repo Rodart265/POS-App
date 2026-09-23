@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+
+    function isStaff() {
+      return isSignedIn() && request.auth.token.role in ['admin', 'cashier'];
+    }
+
+    match /users/{userId} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.cashierId == request.auth.uid
+        && request.resource.data.status == 'pending_payment' || request.resource.data.status == 'confirmed';
+      // Only the confirming cashier or an admin can move pending -> confirmed.
+      // Only an admin can void a transaction.
+      allow update: if isAdmin()
+        || (isStaff()
+            && resource.data.status == 'pending_payment'
+            && request.resource.data.status == 'confirmed');
+      allow delete: if false;
+    }
+
+    match /stockLog/{logId} {
+      allow read: if isStaff();
+      allow write: if false; // written only via Cloud Functions
+    }
+
+    match /auditLog/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // written only via Cloud Functions
+    }
+  }
+}
