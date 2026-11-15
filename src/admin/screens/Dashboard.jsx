@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Products from './Products'
 
 // TODO: replace with live Firestore aggregation queries
 const TODAY_SUMMARY = {
@@ -65,62 +66,68 @@ export default function Dashboard() {
       <main className="flex-1 px-8 py-8 max-w-5xl">
         <h1 className="font-display text-2xl text-ink tracking-tight mb-6">{active}</h1>
 
-        {/* Summary ledger row */}
-        <div className="grid grid-cols-3 border-t border-ink/10">
-          <div className="border-b border-r border-ink/10 py-4 pr-6">
-            <p className="font-body text-xs uppercase tracking-wide text-slate">Today's sales</p>
-            <p className="font-mono font-tabular text-2xl text-ink mt-1">
-              {formatMWK(TODAY_SUMMARY.sales)}
-            </p>
-          </div>
-          <div className="border-b border-r border-ink/10 py-4 px-6">
-            <p className="font-body text-xs uppercase tracking-wide text-slate">Transactions</p>
-            <p className="font-mono font-tabular text-2xl text-ink mt-1">
-              {TODAY_SUMMARY.transactions}
-            </p>
-          </div>
-          <div className="border-b border-ink/10 py-4 pl-6">
-            <p className="font-body text-xs uppercase tracking-wide text-slate">Voided</p>
-            <p className="font-mono font-tabular text-2xl text-signal mt-1">
-              {TODAY_SUMMARY.voided}
-            </p>
-          </div>
-        </div>
+        {active === 'Products' ? (
+          <Products />
+        ) : (
+          <>
+            {/* Summary ledger row */}
+            <div className="grid grid-cols-3 border-t border-ink/10">
+              <div className="border-b border-r border-ink/10 py-4 pr-6">
+                <p className="font-body text-xs uppercase tracking-wide text-slate">Today's sales</p>
+                <p className="font-mono font-tabular text-2xl text-ink mt-1">
+                  {formatMWK(TODAY_SUMMARY.sales)}
+                </p>
+              </div>
+              <div className="border-b border-r border-ink/10 py-4 px-6">
+                <p className="font-body text-xs uppercase tracking-wide text-slate">Transactions</p>
+                <p className="font-mono font-tabular text-2xl text-ink mt-1">
+                  {TODAY_SUMMARY.transactions}
+                </p>
+              </div>
+              <div className="border-b border-ink/10 py-4 pl-6">
+                <p className="font-body text-xs uppercase tracking-wide text-slate">Voided</p>
+                <p className="font-mono font-tabular text-2xl text-signal mt-1">
+                  {TODAY_SUMMARY.voided}
+                </p>
+              </div>
+            </div>
 
-        {/* Transaction ledger */}
-        <div className="mt-8">
-          <p className="font-body text-xs uppercase tracking-wide text-slate mb-2">
-            Recent transactions
-          </p>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-ink/10">
-                <th className="text-left font-body text-xs text-slate font-medium py-2">ID</th>
-                <th className="text-left font-body text-xs text-slate font-medium py-2">Time</th>
-                <th className="text-left font-body text-xs text-slate font-medium py-2">Cashier</th>
-                <th className="text-left font-body text-xs text-slate font-medium py-2">Method</th>
-                <th className="text-right font-body text-xs text-slate font-medium py-2">Amount</th>
-                <th className="text-right font-body text-xs text-slate font-medium py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-ink/10">
-              {RECENT_TRANSACTIONS.map((txn) => (
-                <tr key={txn.id}>
-                  <td className="font-mono text-xs text-ink py-3">{txn.id}</td>
-                  <td className="font-body text-sm text-slate py-3">{txn.time}</td>
-                  <td className="font-body text-sm text-ink py-3">{txn.cashier}</td>
-                  <td className="font-body text-sm text-slate py-3">{txn.method}</td>
-                  <td className="font-mono font-tabular text-sm text-ink py-3 text-right">
-                    {formatMWK(txn.amount)}
-                  </td>
-                  <td className={`font-body text-sm py-3 text-right ${STATUS_STYLE[txn.status]}`}>
-                    {STATUS_LABEL[txn.status]}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            {/* Transaction ledger */}
+            <div className="mt-8">
+              <p className="font-body text-xs uppercase tracking-wide text-slate mb-2">
+                Recent transactions
+              </p>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-ink/10">
+                    <th className="text-left font-body text-xs text-slate font-medium py-2">ID</th>
+                    <th className="text-left font-body text-xs text-slate font-medium py-2">Time</th>
+                    <th className="text-left font-body text-xs text-slate font-medium py-2">Cashier</th>
+                    <th className="text-left font-body text-xs text-slate font-medium py-2">Method</th>
+                    <th className="text-right font-body text-xs text-slate font-medium py-2">Amount</th>
+                    <th className="text-right font-body text-xs text-slate font-medium py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink/10">
+                  {RECENT_TRANSACTIONS.map((txn) => (
+                    <tr key={txn.id}>
+                      <td className="font-mono text-xs text-ink py-3">{txn.id}</td>
+                      <td className="font-body text-sm text-slate py-3">{txn.time}</td>
+                      <td className="font-body text-sm text-ink py-3">{txn.cashier}</td>
+                      <td className="font-body text-sm text-slate py-3">{txn.method}</td>
+                      <td className="font-mono font-tabular text-sm text-ink py-3 text-right">
+                        {formatMWK(txn.amount)}
+                      </td>
+                      <td className={`font-body text-sm py-3 text-right ${STATUS_STYLE[txn.status]}`}>
+                        {STATUS_LABEL[txn.status]}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </main>
     </div>
   )
